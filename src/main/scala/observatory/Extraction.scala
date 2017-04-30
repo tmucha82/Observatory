@@ -2,10 +2,16 @@ package observatory
 
 import java.time.LocalDate
 
+import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+
 /**
   * 1st milestone: data extraction
   */
-object Extraction {
+object Extraction extends Observatory {
+
+  import sparkSession.implicits._
+
 
   /**
     * @param year             Year number
@@ -25,4 +31,28 @@ object Extraction {
     ???
   }
 
+
+  /**
+    * @param stationsFile file with all stations
+    * @return dataset with all stations
+    */
+  def stations(stationsFile: String): Dataset[Station] = {
+
+    val stationSchema = StructType(List(
+      StructField("STN", StringType, nullable = true),
+      StructField("WBAN", StringType, nullable = true),
+      StructField("Latitude", DoubleType, nullable = true),
+      StructField("Longitude", DoubleType, nullable = true)
+    ))
+
+    val stationDataFrame = sparkSession.read
+      .format("csv")
+      .option("header", "false")
+      .option("mode", "DROPMALFORMED")
+      .schema(stationSchema)
+      .csv(this.getClass.getResource(stationsFile).getPath)
+
+    stationDataFrame.map(row =>
+      Station(row.getAs[String]("STN"), row.getAs[String]("WBAN"), Location(row.getAs[Double]("Latitude"), row.getAs[Double]("Longitude"))))
+  }
 }
