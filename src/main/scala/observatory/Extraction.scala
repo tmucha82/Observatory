@@ -2,8 +2,8 @@ package observatory
 
 import java.time.LocalDate
 
-import org.apache.spark.sql.Dataset
-import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, Dataset}
 
 /**
   * 1st milestone: data extraction
@@ -11,6 +11,8 @@ import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructTy
 object Extraction extends Observatory {
 
   import sparkSession.implicits._
+
+  implicit val localDateEncoder = org.apache.spark.sql.Encoders.kryo[LocalDate]
 
 
   /**
@@ -31,28 +33,12 @@ object Extraction extends Observatory {
     ???
   }
 
-
   /**
     * @param stationsFile file with all stations
     * @return dataset with all stations
     */
   def stations(stationsFile: String): Dataset[Station] = {
-
-    val stationSchema = StructType(List(
-      StructField("stn", StringType, nullable = true),
-      StructField("wban", StringType, nullable = true),
-      StructField("latitude", DoubleType, nullable = true),
-      StructField("longitude", DoubleType, nullable = true)
-    ))
-
-    val stationDataFrame = sparkSession.read
-      .format("csv")
-      .option("header", "false")
-      .option("mode", "DROPMALFORMED")
-      .schema(stationSchema)
-      .csv(this.getClass.getResource(stationsFile).getPath)
-
-    stationDataFrame.map {
+    createDataFrameFormCvs(stationsFile, createStationSchema).map {
       case row =>
         val location = (Option(row.getAs[Double]("latitude")), Option(row.getAs[Double]("longitude"))) match {
           case (Some(latitude), Some(longitude)) => Some(Location(latitude, longitude))
@@ -61,5 +47,49 @@ object Extraction extends Observatory {
         }
         Station(Option(row.getAs[String]("stn")), Option(row.getAs[String]("wban")), location)
     }
+  }
+
+  def temperatures(year: Int, temperaturesFile: String): Dataset[TemperatureRecord] = {
+    createDataFrameFormCvs(temperaturesFile, createTemperatureSchema).map {
+      case row =>
+        TemperatureRecord(Option(row.getAs[String]("stn")), Option(row.getAs[String]("wban")),
+          MeasureDate(year, row.getAs[Int]("month"), row.getAs[Int]("day")), row.getAs[Double]("temperature"))
+    }
+  }
+
+  def createStationSchema: StructType = {
+    StructType(List(
+      StructField("stn", StringType, nullable = true),
+      StructField("wban", StringType, nullable = true),
+      StructField("latitude", DoubleType, nullable = true),
+      StructField("longitude", DoubleType, nullable = true)
+    ))
+  }
+
+  def createTemperatureSchema: StructType = {
+    StructType(List(
+      StructField("stn", StringType, nullable = true),
+      StructField("wban", StringType, nullable = true),
+      StructField("month", IntegerType, nullable = false),
+      StructField("day", IntegerType, nullable = false),
+      StructField("temperature", DoubleType, nullable = false)
+    ))
+  }
+
+  def createDataFrameFormCvs(cvsFile: String, schema: StructType): DataFrame = {
+    sparkSession.read
+      .format("csv")
+      .option("header", "false")
+      .option("mode", "DROPMALFORMED")
+      .schema(schema)
+      .csv(getResourcePath(cvsFile))
+  }
+
+  def celsiusDegree(fahrenheitDegree: Double): Double = {
+    (fahrenheitDegree - 32) / 1.8
+  }
+
+  def getResourcePath(filePath: String): String = {
+    this.getClass.getResource(filePath).getPath
   }
 }

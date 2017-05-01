@@ -13,11 +13,13 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
   }
 
   trait TestSet {
+    val testYear = 2013
     val testStationsPathFile = "/testStations.csv"
-    val testTemperaturesOf2013PathFile = "/test2013.csv"
+    val testTemperaturesOf2013PathFile = s"/test$testYear.csv"
 
+    val year = 2013
     val stationsPathFile = "/stations.csv"
-    val temperaturesOf2013PathFile = "/2013.csv"
+    val temperaturesOf2013PathFile = s"/$year.csv"
   }
 
   test("stations for test file") {
@@ -30,7 +32,8 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
       assert(Station(Some("010016"), None, Some(Location(64.850, 11.233))) === firstStations(2))
       assert(Station(Some("010017"), None, Some(Location(59.980, 2.250))) === firstStations(3))
       assert(Station(Some("010020"), None, Some(Location(80.050, 16.250))) === firstStations(4))
-    }
+    }temperatures
+    ()
   }
 
   test("stations for big file") {
@@ -44,6 +47,35 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
       assert(Station(Some("007025"), None, None) === firstStations(3))
       assert(Station(Some("007026"), None, Some(Location(0.0d, 0.0d))) === firstStations(4))
     }
+    ()
+  }
+
+  test("temperatures for test file") {
+    new TestSet {
+      val temperaturesDataSet = temperatures(testYear, testTemperaturesOf2013PathFile)
+      temperaturesDataSet.show(5)
+      val firstTemperatures = temperaturesDataSet.take(5)
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 10), 84.2) === firstTemperatures(0))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 11), 79.7) === firstTemperatures(1))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 12), 74.4) === firstTemperatures(2))
+      assert(TemperatureRecord(Some("722003"), Some("54930"), MeasureDate(2013, 1, 1), -4.0) === firstTemperatures(3))
+      assert(TemperatureRecord(Some("722003"), Some("54930"), MeasureDate(2013, 1, 2), 15.2) === firstTemperatures(4))
+    }
+    ()
+  }
+
+  test("temperatures for big file") {
+    new TestSet {
+      val temperaturesDataSet = temperatures(year, temperaturesOf2013PathFile)
+      temperaturesDataSet.show(5)
+      val firstTemperatures = temperaturesDataSet.take(5)
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 10), 84.2) === firstTemperatures(0))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 11), 79.7) === firstTemperatures(1))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 12), 74.4) === firstTemperatures(2))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 13), 76.9) === firstTemperatures(3))
+      assert(TemperatureRecord(Some("007018"), None, MeasureDate(2013, 7, 14), 79.6) === firstTemperatures(4))
+    }
+    ()
   }
 
   ignore("locateTemperatures for test file") {
@@ -58,6 +90,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
 
       locateTemperatures(1975, testStationsPathFile, "")
     }
+    ()
   }
 
   ignore("locateTemperatures for big file") {
@@ -71,6 +104,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
         */
       locateTemperatures(1975, "", "")
     }
+    ()
   }
 
 }
