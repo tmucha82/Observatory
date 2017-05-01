@@ -32,7 +32,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
       assert(Station(Some("010016"), None, Some(Location(64.850, 11.233))) === firstStations(2))
       assert(Station(Some("010017"), None, Some(Location(59.980, 2.250))) === firstStations(3))
       assert(Station(Some("010020"), None, Some(Location(80.050, 16.250))) === firstStations(4))
-    }temperatures
+    }
     ()
   }
 
