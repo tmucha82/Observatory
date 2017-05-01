@@ -39,10 +39,10 @@ object Extraction extends Observatory {
   def stations(stationsFile: String): Dataset[Station] = {
 
     val stationSchema = StructType(List(
-      StructField("STN", StringType, nullable = true),
-      StructField("WBAN", StringType, nullable = true),
-      StructField("Latitude", DoubleType, nullable = true),
-      StructField("Longitude", DoubleType, nullable = true)
+      StructField("stn", StringType, nullable = true),
+      StructField("wban", StringType, nullable = true),
+      StructField("latitude", DoubleType, nullable = true),
+      StructField("longitude", DoubleType, nullable = true)
     ))
 
     val stationDataFrame = sparkSession.read
@@ -52,7 +52,14 @@ object Extraction extends Observatory {
       .schema(stationSchema)
       .csv(this.getClass.getResource(stationsFile).getPath)
 
-    stationDataFrame.map(row =>
-      Station(row.getAs[String]("STN"), row.getAs[String]("WBAN"), Location(row.getAs[Double]("Latitude"), row.getAs[Double]("Longitude"))))
+    stationDataFrame.map {
+      case row =>
+        val location = (Option(row.getAs[Double]("latitude")), Option(row.getAs[Double]("longitude"))) match {
+          case (Some(latitude), Some(longitude)) => Some(Location(latitude, longitude))
+          case _ => None
+
+        }
+        Station(Option(row.getAs[String]("stn")), Option(row.getAs[String]("wban")), location)
+    }
   }
 }

@@ -22,18 +22,31 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
 
   test("stations for test file") {
     new TestSet {
-      val stationList = stations(testStationsPathFile)
-      stationList.show(10)
+      val stationDataSet = stations(testStationsPathFile)
+      stationDataSet.show(5)
+      val firstStations = stationDataSet.take(5)
+      assert(Station(Some("010014"), None, Some(Location(59.792, 5.341))) === firstStations(0))
+      assert(Station(Some("010015"), None, Some(Location(61.383, 5.867))) === firstStations(1))
+      assert(Station(Some("010016"), None, Some(Location(64.850, 11.233))) === firstStations(2))
+      assert(Station(Some("010017"), None, Some(Location(59.980, 2.250))) === firstStations(3))
+      assert(Station(Some("010020"), None, Some(Location(80.050, 16.250))) === firstStations(4))
     }
   }
 
   test("stations for big file") {
     new TestSet {
-      stations(stationsPathFile)
+      val stationDataSet = stations(stationsPathFile)
+      stationDataSet.show(5)
+      val firstStations = stationDataSet.take(5)
+      assert(Station(Some("007005"), None, None) === firstStations(0))
+      assert(Station(Some("007011"), None, None) === firstStations(1))
+      assert(Station(Some("007018"), None, Some(Location(0.0d, 0.0d))) === firstStations(2))
+      assert(Station(Some("007025"), None, None) === firstStations(3))
+      assert(Station(Some("007026"), None, Some(Location(0.0d, 0.0d))) === firstStations(4))
     }
   }
 
-  test("locateTemperatures for test file") {
+  ignore("locateTemperatures for test file") {
     new TestSet {
       /**
         * Seq(
@@ -47,7 +60,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("locateTemperatures for big file") {
+  ignore("locateTemperatures for big file") {
     new TestSet {
 
       /**
