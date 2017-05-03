@@ -16,6 +16,13 @@ object Extraction extends Observatory {
 
 
   /**
+    * This method should return the list of all the temperature records converted in degrees Celsius
+    * along with their date and location (ignore data coming from stations that have no GPS coordinates).
+    * You should not round the temperature values.
+    * The file paths are resource paths, so they must be absolute locations in your classpath
+    * (so that you can read them with getResourceAsStream).
+    * For instance, the path for the resource file 1975.csv is "/1975.csv".
+    *
     * @param year             Year number
     * @param stationsFile     Path of the stations resource file to use (e.g. "/stations.csv")
     * @param temperaturesFile Path of the temperatures resource file to use (e.g. "/1975.csv")

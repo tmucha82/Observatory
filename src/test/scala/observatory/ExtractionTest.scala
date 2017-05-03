@@ -1,5 +1,7 @@
 package observatory
 
+import java.time.LocalDate
+
 import observatory.Extraction._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -13,6 +15,9 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
   }
 
   trait TestSet {
+    val miniTestStationsPathFile = "/miniTestStations.csv"
+    val miniTestTemperaturesOf2013PathFile = "/miniTestTemperatures.csv"
+
     val testYear = 2013
     val testStationsPathFile = "/testStations.csv"
     val testTemperaturesOf2013PathFile = s"/test$testYear.csv"
@@ -80,29 +85,18 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
 
   ignore("locateTemperatures for test file") {
     new TestSet {
-      /**
-        * Seq(
-        * (LocalDate.of(2015, 8, 11), Location(37.35, -78.433), 27.3),
-        * (LocalDate.of(2015, 12, 6), Location(37.358, -78.438), 0.0),
-        * (LocalDate.of(2015, 1, 29), Location(37.358, -78.438), 2.0)
-        * )
-        */
-
-      locateTemperatures(1975, testStationsPathFile, "")
+      assert(Seq(
+        (LocalDate.of(2015, 8, 11), Location(37.35, -78.433), 27.3),
+        (LocalDate.of(2015, 12, 6), Location(37.358, -78.438), 0.0),
+        (LocalDate.of(2015, 1, 29), Location(37.358, -78.438), 2.0)
+      ) === locateTemperatures(1975, miniTestStationsPathFile, miniTestTemperaturesOf2013PathFile))
     }
     ()
   }
 
   ignore("locateTemperatures for big file") {
     new TestSet {
-
-      /**
-        * Seq(
-        * (Location(37.35, -78.433), 27.3),
-        * (Location(37.358, -78.438), 1.0)
-        * )
-        */
-      locateTemperatures(1975, "", "")
+      assert(Seq() === locateTemperatures(year, stationsPathFile, temperaturesOf2013PathFile))
     }
     ()
   }
