@@ -33,6 +33,7 @@ object Extraction extends Observatory {
     val temperaturesDataSet = temperatures(year, temperaturesFile)
     val stationAndTemperatureDateSet = stationTemperatures(stationsDataSet, temperaturesDataSet)
 
+    // collect is very heavy
     stationAndTemperatureDateSet.collect().par.map {
       case (date, location, temperature) => (LocalDate.of(date.year, date.month, date.day), location, celsiusDegree(temperature))
     }.seq
@@ -45,7 +46,7 @@ object Extraction extends Observatory {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    ???
+    records.par.groupBy(_._2).mapValues(l => l.aggregate(0.0)((avgTemperature: Double, next: (LocalDate, Location, Double)) => avgTemperature + next._3 / l.size, _ + _)).seq.toSeq
   }
 
   /**

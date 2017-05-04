@@ -108,9 +108,17 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     ()
   }
 
-  ignore("locateTemperatures for big file") {
+  test("locationYearlyAverageRecords for test file") {
     new TestSet {
-      assert(Seq() === locateTemperatures(year, stationsPathFile, temperaturesOf2013PathFile))
+      //Map(Location(37.358,-78.438) -> 1.0, Location(37.35,-78.433) -> 27.3)
+
+      //      Map(Location(37.35,-78.433) -> 27.3, Location(37.358,-78.438) -> 2.0)
+
+      assert(Seq((Location(37.35, -78.433), 27.3), (Location(37.358, -78.438), 1.0)) === locationYearlyAverageRecords(Seq(
+        (LocalDate.of(1975, 1, 29), Location(37.358, -78.438), 2.0),
+        (LocalDate.of(1975, 8, 11), Location(37.35, -78.433), 27.3),
+        (LocalDate.of(1975, 12, 6), Location(37.358, -78.438), 0.0)
+      )))
     }
     ()
   }
