@@ -3,7 +3,7 @@ package observatory
 import java.time.LocalDate
 
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.sql.{DataFrame, Column, Dataset}
 
 /**
   * 1st milestone: data extraction
@@ -29,10 +29,18 @@ object Extraction extends Observatory {
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
-    ???
+    val stationsDataSet = stations(stationsFile).filter((station: Station) => station.location.isDefined)
+    val temperaturesDataSet = temperatures(year, temperaturesFile)
+    val stationAndTemperatureDateSet = stationTemperatures(stationsDataSet, temperaturesDataSet)
+
+    stationAndTemperatureDateSet.collect().par.map {
+      case (date, location, temperature) => (LocalDate.of(date.year, date.month, date.day), location, celsiusDegree(temperature))
+    }.seq
   }
 
   /**
+    * This method should return the average temperature on each location, over a year.
+    *
     * @param records A sequence containing triplets (date, location, temperature)
     * @return A sequence containing, for each location, the average temperature over the year.
     */
@@ -56,11 +64,36 @@ object Extraction extends Observatory {
     }
   }
 
+  /**
+    * @param year             year which we want to check
+    * @param temperaturesFile file with temperatures records
+    * @return data set with temperature records related to given year
+    */
   def temperatures(year: Int, temperaturesFile: String): Dataset[TemperatureRecord] = {
     createDataFrameFormCvs(temperaturesFile, createTemperatureSchema).map {
       case row =>
         TemperatureRecord(Option(row.getAs[String]("stn")), Option(row.getAs[String]("wban")),
           MeasureDate(year, row.getAs[Int]("month"), row.getAs[Int]("day")), row.getAs[Double]("temperature"))
+    }
+  }
+
+  /**
+    * @param stationsDataSet     station data set with non null location
+    * @param temperaturesDataSet temperature records got from specific station
+    * @return data set with station and related with temperature set
+    */
+  def stationTemperatures(stationsDataSet: Dataset[Station], temperaturesDataSet: Dataset[TemperatureRecord]): Dataset[(MeasureDate, Location, Double)] = {
+    def bothNull(first: Column, second: Column): Column = first.isNull && second.isNull
+
+    val stationStn = stationsDataSet("stn")
+    val temperatureStn = temperaturesDataSet("stn")
+    val stationWban = stationsDataSet("wban")
+    val temperatureWban = temperaturesDataSet("wban")
+
+    val joinCondition = (stationStn === temperatureStn || bothNull(stationStn, temperatureStn)) && (stationWban === temperatureWban || bothNull(stationWban, temperatureWban))
+
+    stationsDataSet.joinWith(temperaturesDataSet, joinCondition).map {
+      case (station, temperatureRecord) => (temperatureRecord.date, station.location.get, temperatureRecord.temperature)
     }
   }
 
