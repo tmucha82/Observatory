@@ -83,6 +83,19 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     ()
   }
 
+  test("stationTemperatures for test file") {
+    new TestSet {
+      val stationTemperaturesDataSet = stationTemperatures(stations(miniTestStationsPathFile).filter((station: Station) => station.location.isDefined), temperatures(testYear, miniTestTemperaturesOf2013PathFile))
+      val orderedDataSet = stationTemperaturesDataSet.orderBy(stationTemperaturesDataSet("_1"))
+      orderedDataSet.show()
+      val result = orderedDataSet.collect()
+      assert((MeasureDate(2013, 1, 29), Location(37.358, -78.438), 35.6) === result(0))
+      assert((MeasureDate(2013, 8, 11), Location(37.35, -78.433), 81.14) === result(1))
+      assert((MeasureDate(2013, 12, 6), Location(37.358, -78.438), 32.0) === result(2))
+    }
+    ()
+  }
+
   test("locateTemperatures for test file") {
     new TestSet {
       val result = locateTemperatures(1975, miniTestStationsPathFile, miniTestTemperaturesOf2013PathFile).toList.sortWith((first, second) => first._1.isBefore(second._1))
