@@ -100,7 +100,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     new TestSet {
       val result = locateTemperatures(1975, miniTestStationsPathFile, miniTestTemperaturesOf2013PathFile).toList.sortWith((first, second) => first._1.isBefore(second._1))
       assert(Seq(
-        (LocalDate.of(1975, 1, 29), Location(37.358, -78.438), 2.000000000000001),
+        (LocalDate.of(1975, 1, 29), Location(37.358, -78.438), 2.0),
         (LocalDate.of(1975, 8, 11), Location(37.35, -78.433), 27.3),
         (LocalDate.of(1975, 12, 6), Location(37.358, -78.438), 0.0)
       ) === result)
@@ -110,7 +110,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
 
   test("locationYearlyAverageRecords for test file") {
     new TestSet {
-      assert(Seq((Location(37.35, -78.433), 27.3), (Location(37.358, -78.438), 1.0)) === locationYearlyAverageRecords(Seq(
+      assert(Seq((Location(37.358, -78.438), 1.0), (Location(37.35, -78.433), 27.3)) === locationYearlyAverageRecords(Seq(
         (LocalDate.of(1975, 1, 29), Location(37.358, -78.438), 2.0),
         (LocalDate.of(1975, 8, 11), Location(37.35, -78.433), 27.3),
         (LocalDate.of(1975, 12, 6), Location(37.358, -78.438), 0.0)

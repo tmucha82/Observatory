@@ -3,7 +3,7 @@ package observatory
 import java.time.LocalDate
 
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Column, Dataset}
+import org.apache.spark.sql.{Column, DataFrame, Dataset}
 
 /**
   * 1st milestone: data extraction
@@ -46,7 +46,11 @@ object Extraction extends Observatory {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    records.par.groupBy(_._2).mapValues(l => l.aggregate(0.0)((avgTemperature: Double, next: (LocalDate, Location, Double)) => avgTemperature + next._3 / l.size, _ + _)).seq.toSeq
+    records.par.groupBy(_._2)
+      .mapValues(l => l.aggregate(0.0)((avgTemperature: Double, next: (LocalDate, Location, Double)) => avgTemperature + next._3 / l.size, _ + _))
+      .map {
+        case (location, avgTemperature) => (location, roundNumber(avgTemperature))
+      }.seq.toSeq
   }
 
   /**
@@ -126,11 +130,9 @@ object Extraction extends Observatory {
       .csv(getResourcePath(cvsFile))
   }
 
-  def celsiusDegree(fahrenheitDegree: Double): Double = {
-    (fahrenheitDegree - 32) / 1.8
-  }
+  def celsiusDegree(fahrenheitDegree: Double): Double = roundNumber((fahrenheitDegree - 32) / 1.8)
 
-  def getResourcePath(filePath: String): String = {
-    this.getClass.getResource(filePath).getPath
-  }
+  def roundNumber(number: Double): Double = math.rint(number * 100) / 100
+
+  def getResourcePath(filePath: String): String = this.getClass.getResource(filePath).getPath
 }
