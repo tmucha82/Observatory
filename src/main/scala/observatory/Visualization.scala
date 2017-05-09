@@ -7,6 +7,8 @@ import com.sksamuel.scrimage.{Image, Pixel}
   */
 object Visualization {
 
+  private val p = 3
+
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
     * @param location Location where to predict the temperature
@@ -33,6 +35,8 @@ object Visualization {
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
     ???
   }
+
+  def distance(location1: Location, location2: Location): Double = location1.earthDistance(location2)
 
 }
 
