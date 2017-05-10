@@ -5,10 +5,22 @@ import scala.math._
 
 case class Location(lat: Double, lon: Double) {
 
-  def earthDistance(other: Location): Double = point.earthDistance(other.point)
+  def earthDistance(other: Location): Double = Earth.R * greatCircleDistance(other)
 
-  lazy val point: Point = Point(toRadians(lat), toDegrees(lon))
+  /**
+    * Calculate distance between two location on sphere in km
+    *
+    * @param other location that we want to calculate distance to this location from this
+    * @return distance between this and other locations
+    * @see https://en.wikipedia.org/wiki/Great-circle_distance
+    */
+  private def greatCircleDistance(other: Location): Double = {
+    val diffLatitudeRadius = abs(other.lat - this.lat).toRadians
+    val diffLongitudeRadius = abs(other.lon - this.lon).toRadians
 
+    val a = pow(sin(diffLatitudeRadius / 2), 2) + cos(this.lat.toRadians) * cos(other.lat.toRadians) * pow(sin(diffLongitudeRadius / 2), 2)
+    2 * atan2(sqrt(a), sqrt(1 - a))
+  }
 }
 
 case class Color(red: Int, green: Int, blue: Int)
@@ -20,24 +32,8 @@ case class TemperatureRecord(stn: Option[String], wban: Option[String], date: Me
 case class MeasureDate(year: Int, month: Int, day: Int)
 
 object Earth {
-  val R = 6372.8 * 1000 // [m]
+  val R = 6372.8 // [km]
 }
 
-case class Point(latitudeRadius: Double, longitudeRadius: Double) {
-
-  lazy val location: Location = Location(toDegrees(latitudeRadius), toDegrees(longitudeRadius))
-
-  def earthDistance(other: Point): Double = {
-    Earth.R * greatCircleDistance(other)
-  }
-
-  def greatCircleDistance(other: Point): Double = {
-    val diffLatitudeRadius = abs(other.latitudeRadius - this.latitudeRadius)
-    val diffLongitudeRadius = abs(other.longitudeRadius - this.longitudeRadius)
-
-    val a = pow(sin(diffLatitudeRadius / 2), 2) + cos(this.latitudeRadius) * cos(other.latitudeRadius) * pow(sin(diffLongitudeRadius / 2), 2)
-    2 * atan2(sqrt(a), sqrt(1 - a))
-  }
-}
 
 
