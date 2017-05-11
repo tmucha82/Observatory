@@ -42,7 +42,6 @@ object Visualization {
       *
       * @param startPoint (x0, y0)
       * @param endPoint   (x1, y1)
-      * @param value      value of Temperature
       * @return
       */
     def interpolate(startPoint: (Double, Double), endPoint: (Double, Double)): Double => Int = {
