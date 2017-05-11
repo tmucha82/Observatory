@@ -11,10 +11,21 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
 
 
   trait TestSet {
-    val averageTemperature = Seq(
-      (Location(1.0, 1.0), 10.0),
-      (Location(20.0, 20.0), 20.0)
+    val averageTemperatureSet1 = Seq(
+      (Location(10.0, 10.0), 10.0),
+      (Location(30.0, 30.0), 20.0)
     )
+
+    val averageTemperatureSet2 = Seq(
+      (Location(10.0, 0.0), 10.0),
+      (Location(-10.0, 0.0), 20.0)
+    )
+
+    val averageTemperatureSet3 = Seq(
+      (Location(0.0, 30.0), 10.0),
+      (Location(0.0, 30.0), 20.0)
+    )
+
   }
 
   test("distance between two given locations") {
@@ -29,8 +40,17 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
 
   test("predictTemperature for location exact as one of location") {
     new TestSet {
-      assert(10.0 === predictTemperature(averageTemperature, Location(1.0, 1.0)))
-      assert(20.0 === predictTemperature(averageTemperature, Location(20.0, 20.0)))
+      assert(10.0 === predictTemperature(averageTemperatureSet1, Location(10.0, 10.0)))
+      assert(20.0 === predictTemperature(averageTemperatureSet1, Location(30.0, 30.0)))
+    }
+    ()
+  }
+
+  test("predictTemperature for location which is not location of any station") {
+    new TestSet {
+      assert(15 === predictTemperature(averageTemperatureSet1, Location(20.0, 20.0)).round)
+      assert(15 === predictTemperature(averageTemperatureSet2, Location(0.0, 0.0)).round)
+      assert(15 === predictTemperature(averageTemperatureSet3, Location(0.0, 0.0)).round)
     }
     ()
   }
