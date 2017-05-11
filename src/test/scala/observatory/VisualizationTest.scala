@@ -35,4 +35,11 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
     ()
   }
 
+  test("interpolateColor") {
+    new TestSet {
+      // todo
+    }
+    ()
+  }
+
 }

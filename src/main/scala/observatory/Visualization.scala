@@ -33,6 +33,27 @@ object Visualization {
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
+
+
+
+    /**
+      * Function which convert temperature to value of
+      * https://en.wikipedia.org/wiki/Linear_interpolation
+      *
+      * @param startPoint (x0, y0)
+      * @param endPoint   (x1, y1)
+      * @param value      value of Temperature
+      * @return
+      */
+    def interpolate(startPoint: (Double, Double), endPoint: (Double, Double)): Double => Int = {
+      (value: Double) => {
+        val factor = (endPoint._2 - startPoint._2) / (endPoint._1 - startPoint._1)
+        val p = startPoint._2 + factor * (value - startPoint._1)
+        p.round.toInt
+      }
+
+    }
+
     ???
   }
 
