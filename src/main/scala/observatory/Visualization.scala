@@ -1,13 +1,13 @@
 package observatory
 
-import com.sksamuel.scrimage.Image
+import com.sksamuel.scrimage.{RGBColor, Pixel, Image}
 
 /**
   * 2nd milestone: basic visualization
   */
 object Visualization {
 
-  private val p = 3
+  private val p = 2
   private val distanceDelta = 1 //[km]
 
   /**
@@ -33,9 +33,6 @@ object Visualization {
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
-
-
-
     /**
       * Function which convert temperature to value of
       * https://en.wikipedia.org/wiki/Linear_interpolation
@@ -48,21 +45,36 @@ object Visualization {
       (value: Double) => {
         val factor = (endPoint._2 - startPoint._2) / (endPoint._1 - startPoint._1)
         val p = startPoint._2 + factor * (value - startPoint._1)
-        p.round.toInt
+        math.round(p).toInt
       }
-
     }
 
-    ???
+    val sortedPoints = points.toList.sortBy { case (temperature, _) => temperature }
+    sortedPoints.zip(sortedPoints.tail).find { case ((temperature1, _), (temperature2, _)) => value >= temperature1 && value < temperature2 } match {
+      case Some(((temperature1, color1), (temperature2, color2))) =>
+        def interpolateBaseColor(baseColor1: Int, baseColor2: Int) = interpolate((temperature1, baseColor1), (temperature2, baseColor2))(value)
+
+        Color(
+          interpolateBaseColor(color1.red, color2.red),
+          interpolateBaseColor(color1.green, color2.green),
+          interpolateBaseColor(color1.blue, color2.blue)
+        )
+      case None if value < sortedPoints.head._1 => sortedPoints.head._2
+      case _ => sortedPoints.last._2
+    }
   }
 
   /**
-    * @param temperatures Known temperatures
+    * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
     * @param colors       Color scale
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    ???
+    val pixels = (0 until (360 * 180)).map(_ => Pixel(RGBColor(0, 0, 0))).toArray
+
+    //TODO
+
+    Image(360, 180, pixels)
   }
 }
 
