@@ -87,10 +87,11 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
       assert(Color(0, 0, 255) === interpolateColor(List((-4.197620741379907, Color(255, 0, 0)), (20.551397371699693, Color(0, 0, 255))), 25))
       assert(Color(0, 0, 0) === interpolateColor(colorPalette1, 50.0))
       assert(Color(255, 0, 127) === interpolateColor(colorPalette1, 0.0))
-      assert(Color(127, 127, 127) === interpolateColor(colorPalette1, 75.0))
+      assert(Color(128, 128, 128) === interpolateColor(colorPalette1, 75.0))
       assert(Color(128, 0, 64) === interpolateColor(colorPalette1, 25.0))
       assert(Color(255, 0, 127) === interpolateColor(colorPalette1, -10.0))
       assert(Color(255, 255, 255) === interpolateColor(colorPalette1, 200.0))
+      assert(Color(128, 0, 128) === interpolateColor(List((-44.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), - 22.0))
     }
     ()
   }

@@ -1,6 +1,6 @@
 package observatory
 
-import com.sksamuel.scrimage.{RGBColor, Pixel, Image}
+import com.sksamuel.scrimage.{Image, Pixel, RGBColor}
 
 /**
   * 2nd milestone: basic visualization
@@ -46,8 +46,7 @@ object Visualization {
       */
     def interpolate(startPoint: (Double, Double), endPoint: (Double, Double)): Double => Int = {
       (value: Double) => {
-        val factor = (endPoint._2 - startPoint._2) / (endPoint._1 - startPoint._1)
-        val p = startPoint._2 + factor * (value - startPoint._1)
+        val p = startPoint._2 + (endPoint._2 - startPoint._2) * (value - startPoint._1) / (endPoint._1 - startPoint._1)
         math.round(p).toInt
       }
     }
