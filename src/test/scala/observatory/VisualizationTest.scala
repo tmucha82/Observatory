@@ -1,5 +1,8 @@
 package observatory
 
+import java.io.File
+
+import com.sksamuel.scrimage.Pixel
 import observatory.Visualization._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -11,6 +14,11 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
 
 
   trait TestSet {
+    val year = 1975
+    val stationsPath = "/stations.csv"
+    val temperaturePath = s"/test$year.csv"
+    val file = new File(s"src/test/resources/${year}Temperatures.png")
+
     val averageTemperatureSet1 = Seq(
       (Location(10.0, 10.0), 10.0),
       (Location(30.0, 30.0), 20.0)
@@ -90,10 +98,31 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
 
   test("visualize for location and temperatures") {
     new TestSet {
-      val temperatures: Iterable[(Location, Double)] = List()
-      val image = visualize(temperatures, colorPalette2.toIterable)
-      assert(360 === image.width)
-      assert(180 === image.height)
+      val averageTemperatures = List((Location(0, 0), 32.0)).toIterable
+      val image = visualize(averageTemperatures, colorPalette2.toIterable)
+
+      assert(imageWidth === image.width)
+      assert(imageHeight === image.height)
+      image.pixels.foreach(pixel => {
+        assert(255 === pixel.red)
+        assert(0 === pixel.green)
+        assert(0 === pixel.blue)
+      })
+    }
+    ()
+  }
+
+  ignore("visualize for real location and temperatures") {
+    new TestSet {
+      lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+
+      val image = visualize(averageTemperatures, colorPalette2.toIterable)
+      assert(imageWidth === image.width)
+      assert(imageHeight === image.height)
+
+      image.output(file)
+      assert(file.exists)
     }
     ()
   }

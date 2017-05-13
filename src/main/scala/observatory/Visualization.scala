@@ -7,8 +7,11 @@ import com.sksamuel.scrimage.{RGBColor, Pixel, Image}
   */
 object Visualization {
 
-  private val p = 2
+  private val p = 3
   private val distanceDelta = 1 //[km]
+
+  val imageWidth = 360
+  val imageHeight = 180
 
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
@@ -70,11 +73,19 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    val pixels = (0 until (360 * 180)).map(_ => Pixel(RGBColor(0, 0, 0))).toArray
+    def location(x: Int, y: Int): Location = Location((imageHeight / 2) - y, x - (imageWidth / 2))
+    val locations = for {
+      y <- 0 until imageHeight
+      x <- 0 until imageWidth
+    } yield location(x, y)
 
-    //TODO
+    val pixels = locations.par.map {
+      case location =>
+        val color = interpolateColor(colors, predictTemperature(temperatures, location))
+        Pixel(RGBColor(color.red, color.green, color.blue))
+    }
 
-    Image(360, 180, pixels)
+    Image(imageWidth, imageHeight, pixels.toArray)
   }
 }
 
