@@ -2,7 +2,6 @@ package observatory
 
 import java.io.File
 
-import com.sksamuel.scrimage.Pixel
 import observatory.Visualization._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
