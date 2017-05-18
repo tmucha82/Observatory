@@ -1,5 +1,7 @@
 package observatory
 
+import java.net.URI
+
 import scala.math._
 
 
@@ -30,6 +32,23 @@ case class Station(stn: Option[String], wban: Option[String], location: Option[L
 case class TemperatureRecord(stn: Option[String], wban: Option[String], date: MeasureDate, temperature: Double)
 
 case class MeasureDate(year: Int, month: Int, day: Int)
+
+/**
+  * From http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Scala
+  *
+  * @param x    X coordinate
+  * @param y    Y coordinate
+  * @param zoom Zoom level
+  * @return The latitude and longitude of the top-left corner of the tile, as per http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+  */
+case class Tile(x: Int, y: Int, zoom: Short) {
+  def location = {
+    val zoomFactor = 1 << zoom
+    Location(toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / zoomFactor)))), x.toDouble / zoomFactor * 360.0 - 180.0)
+  }
+
+  def toURI = new URI("http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png")
+}
 
 object Earth {
   val R = 6372.8 // [km]

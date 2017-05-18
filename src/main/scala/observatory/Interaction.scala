@@ -13,12 +13,7 @@ object Interaction {
     * @param y    Y coordinate
     * @return The latitude and longitude of the top-left corner of the tile, as per http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
     */
-  def tileLocation(zoom: Int, x: Int, y: Int): Location = {
-    val n = math.pow(2, zoom)
-    val latRad = math.atan(math.sinh(math.Pi * (1 - 2 * y / n)))
-    Location(latRad.toDegrees, x / n * 360 - 180)
-    ???
-  }
+  def tileLocation(zoom: Int, x: Int, y: Int): Location = Tile(x, y, zoom.toShort).location
 
   /**
     * @param temperatures Known temperatures

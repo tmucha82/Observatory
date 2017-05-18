@@ -1,5 +1,7 @@
 package observatory
 
+import java.io.File
+
 import observatory.Visualization._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -11,6 +13,11 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
 
 
   trait TestSet {
+    val year = 1975
+    val stationsPath = "/stations.csv"
+    val temperaturePath = s"/test$year.csv"
+    val file = new File(s"src/test/resources/${year}Temperatures.png")
+
     val averageTemperatureSet1 = Seq(
       (Location(10.0, 10.0), 10.0),
       (Location(30.0, 30.0), 20.0)
@@ -80,20 +87,42 @@ class VisualizationTest extends FunSuite with Checkers with Observatory {
       assert(Color(0, 0, 255) === interpolateColor(List((-4.197620741379907, Color(255, 0, 0)), (20.551397371699693, Color(0, 0, 255))), 25))
       assert(Color(0, 0, 0) === interpolateColor(colorPalette1, 50.0))
       assert(Color(255, 0, 127) === interpolateColor(colorPalette1, 0.0))
-      assert(Color(127, 127, 127) === interpolateColor(colorPalette1, 75.0))
+      assert(Color(128, 128, 128) === interpolateColor(colorPalette1, 75.0))
       assert(Color(128, 0, 64) === interpolateColor(colorPalette1, 25.0))
       assert(Color(255, 0, 127) === interpolateColor(colorPalette1, -10.0))
       assert(Color(255, 255, 255) === interpolateColor(colorPalette1, 200.0))
+      assert(Color(128, 0, 128) === interpolateColor(List((-44.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), - 22.0))
     }
     ()
   }
 
   test("visualize for location and temperatures") {
     new TestSet {
-      val temperatures: Iterable[(Location, Double)] = List()
-      val image = visualize(temperatures, colorPalette2.toIterable)
-      assert(360 === image.width)
-      assert(180 === image.height)
+      val averageTemperatures = List((Location(0, 0), 32.0)).toIterable
+      val image = visualize(averageTemperatures, colorPalette2.toIterable)
+
+      assert(imageWidth === image.width)
+      assert(imageHeight === image.height)
+      image.pixels.foreach(pixel => {
+        assert(255 === pixel.red)
+        assert(0 === pixel.green)
+        assert(0 === pixel.blue)
+      })
+    }
+    ()
+  }
+
+  ignore("visualize for real location and temperatures") {
+    new TestSet {
+      lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+
+      val image = visualize(averageTemperatures, colorPalette2.toIterable)
+      assert(imageWidth === image.width)
+      assert(imageHeight === image.height)
+
+      image.output(file)
+      assert(file.exists)
     }
     ()
   }

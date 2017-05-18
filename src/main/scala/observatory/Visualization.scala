@@ -1,14 +1,17 @@
 package observatory
 
-import com.sksamuel.scrimage.{RGBColor, Pixel, Image}
+import com.sksamuel.scrimage.{Image, Pixel, RGBColor}
 
 /**
   * 2nd milestone: basic visualization
   */
 object Visualization {
 
-  private val p = 2
+  private val p = 3
   private val distanceDelta = 1 //[km]
+
+  val imageWidth = 360
+  val imageHeight = 180
 
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
@@ -43,8 +46,7 @@ object Visualization {
       */
     def interpolate(startPoint: (Double, Double), endPoint: (Double, Double)): Double => Int = {
       (value: Double) => {
-        val factor = (endPoint._2 - startPoint._2) / (endPoint._1 - startPoint._1)
-        val p = startPoint._2 + factor * (value - startPoint._1)
+        val p = startPoint._2 + (endPoint._2 - startPoint._2) * (value - startPoint._1) / (endPoint._1 - startPoint._1)
         math.round(p).toInt
       }
     }
@@ -70,11 +72,19 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    val pixels = (0 until (360 * 180)).map(_ => Pixel(RGBColor(0, 0, 0))).toArray
+    def location(x: Int, y: Int): Location = Location((imageHeight / 2) - y, x - (imageWidth / 2))
+    val locations = for {
+      y <- 0 until imageHeight
+      x <- 0 until imageWidth
+    } yield location(x, y)
 
-    //TODO
+    val pixels = locations.par.map {
+      case location =>
+        val color = interpolateColor(colors, predictTemperature(temperatures, location))
+        Pixel(RGBColor(color.red, color.green, color.blue))
+    }
 
-    Image(360, 180, pixels)
+    Image(imageWidth, imageHeight, pixels.toArray)
   }
 }
 
