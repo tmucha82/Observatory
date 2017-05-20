@@ -1,11 +1,15 @@
 package observatory
 
-import com.sksamuel.scrimage.Image
+import com.sksamuel.scrimage.{Image, Pixel}
 
 /**
   * 3rd milestone: interactive visualization
   */
 object Interaction {
+
+  val tileImageWidth = 256
+  val tileImageHeight = 256
+  val tileImageAlpha = 127
 
   /**
     * @param zoom Zoom level
@@ -24,7 +28,12 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, x: Int, y: Int): Image = {
-    ???
+    val pixels = {
+      for (j <- 0 until tileImageHeight; i <- 0 until tileImageWidth)
+        yield Visualization.interpolateColor(colors, Visualization.predictTemperature(temperatures, tileLocation(zoom + 8, tileImageWidth * x + i, tileImageHeight * y + j)))
+    }.map(color => Pixel(color.red, color.green, color.blue, tileImageAlpha))
+
+    Image(tileImageWidth, tileImageHeight, pixels.toArray)
   }
 
   /**
