@@ -57,12 +57,11 @@ class InteractionTest extends FunSuite with Checkers {
         assert(0 === pixel.blue)
         assert(127 === pixel.alpha)
       })
-
     }
     ()
   }
 
-  test("tile for tile (zoom=2, x=1, y=1)") {
+  ignore("tile for tile (zoom=2, x=1, y=1)") {
     new TestSet {
       lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
@@ -74,7 +73,17 @@ class InteractionTest extends FunSuite with Checkers {
 
       image.output(file)
       assert(file.exists)
-
     }
+    ()
+  }
+
+  test("generateTiles with some test data") {
+    new TestSet {
+      def testData(year: Int, zoom: Int, x: Int, y: Int, data: (Int, Int, Int)) = println(s"$year, $zoom, $x, $y, $data")
+
+      val data = Set((2001, (0, 0, 1)), (2002, (1, 1, 2)), (2003, (3, 2, 2)), (2004, (4, 2, 3)))
+      Interaction.generateTiles(data, testData)
+    }
+    ()
   }
 }
