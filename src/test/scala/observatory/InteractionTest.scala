@@ -1,5 +1,7 @@
 package observatory
 
+import java.io.File
+
 import observatory.Interaction._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -24,7 +26,10 @@ class InteractionTest extends FunSuite with Checkers {
       (-50.0, Color(33, 0, 107)),
       (-60.0, Color(0, 0, 0))
     )
-
+    val year = 1975
+    val stationsPath = "/stations.csv"
+    val temperaturePath = s"/test$year.csv"
+    val file = new File(s"src/test/resources/${year}Tile.png")
   }
 
   test("tileLocation for different coordinates and zooms") {
@@ -46,7 +51,30 @@ class InteractionTest extends FunSuite with Checkers {
       val image = tile(averageTemperatures, colorPalette, zoom, x, y)
       assert(tileImageWidth === image.width)
       assert(tileImageHeight === image.height)
+      image.pixels.foreach(pixel => {
+        assert(255 === pixel.red)
+        assert(0 === pixel.green)
+        assert(0 === pixel.blue)
+        assert(127 === pixel.alpha)
+      })
+
     }
     ()
+  }
+
+  test("tile for tile (zoom=2, x=1, y=1)") {
+    new TestSet {
+      lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+
+      val image = tile(averageTemperatures, colorPalette, 2, 1, 1)
+      image.output(file)
+      assert(tileImageWidth === image.width)
+      assert(tileImageHeight === image.height)
+
+      image.output(file)
+      assert(file.exists)
+
+    }
   }
 }
