@@ -29,6 +29,7 @@ class InteractionTest extends FunSuite with Checkers {
     val year = 1975
     val stationsPath = "/stations.csv"
     val temperaturePath = s"/test$year.csv"
+    val temperature2015Path = "/2015.csv"
     val file = new File(s"src/test/resources/${year}Tile.png")
   }
 
@@ -83,6 +84,30 @@ class InteractionTest extends FunSuite with Checkers {
 
       val data = Set((2001, (0, 0, 1)), (2002, (1, 1, 2)), (2003, (3, 2, 2)), (2004, (4, 2, 3)))
       Interaction.generateTiles(data, testData)
+    }
+    ()
+  }
+
+  ignore("generateTiles with data from 2015") {
+    new TestSet {
+      val temperaturesDirectory = new File("target/temperatures")
+      assert(if (temperaturesDirectory.exists()) temperaturesDirectory.exists() else temperaturesDirectory.mkdir())
+
+      def saveImage(year: Int, zoom: Int, x: Int, y: Int, data: Iterable[(Location, Double)]) = {
+        val zoomDirectory = new File(s"target/temperatures/$year/$zoom")
+        assert(if (zoomDirectory.exists()) zoomDirectory.exists() else zoomDirectory.mkdirs())
+
+        val target = new File(s"target/temperatures/$year/$zoom/$x-$y.png")
+        println(target.getCanonicalPath)
+        tile(data, colorPalette, zoom, x, y).output(target)
+        ()
+      }
+
+      lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperaturePath)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+      val data = Set((2015, averageTemperatures))
+      println("#1 generating tiles")
+      Interaction.generateTiles(data, saveImage)
     }
     ()
   }
