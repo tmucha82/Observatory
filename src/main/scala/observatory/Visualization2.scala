@@ -1,6 +1,6 @@
 package observatory
 
-import com.sksamuel.scrimage.{Image, Pixel}
+import com.sksamuel.scrimage.Image
 
 /**
   * 5th milestone: value-added information visualization
@@ -25,13 +25,7 @@ object Visualization2 {
                              d10: Double,
                              d11: Double
                            ): Double = {
-    require(d10 - d00 == 1, "d10 - d00 must be exact 1")
-    require(d01 - d11 == 1, "d01 - d11 must be exact 1")
-    require(d00 - d01 == 1, "d00 - d01 must be exact 1")
-    require(d10 - d11 == 1, "d10 - d11 must be exact 1")
-
-
-    ???
+      d00 * (1 - x) * (1 - y) + d10 * x * (1 - y) + d01 * (1 - x) * y + d11 * x * y
   }
 
   /**
