@@ -22,7 +22,7 @@ object Manipulation {
     * @return A function that, given a latitude and a longitude, returns the average temperature at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Double)]]): (Int, Int) => Double = {
-    (latitude, longitude) => temperaturess.par.map(temperatures => makeGrid(temperatures)(latitude, longitude)).sum / temperaturess.size
+    (latitude, longitude) => temperaturess.map(temperatures => makeGrid(temperatures)(latitude, longitude)).sum / temperaturess.size
   }
 
   /**

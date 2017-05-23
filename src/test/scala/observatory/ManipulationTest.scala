@@ -9,9 +9,10 @@ import org.scalatest.prop.Checkers
 
 @RunWith(classOf[JUnitRunner])
 class ManipulationTest extends FunSuite with Checkers {
-  implicit val doubleEquality = TolerantNumerics.tolerantDoubleEquality(0.01)
 
   trait TestSet {
+    implicit val doubleEquality = TolerantNumerics.tolerantDoubleEquality(0.01)
+
     val testTemperaturesList = Seq(
       Seq((Location(0, 10), 20.0), (Location(0, -10), 40.0)),
       Seq((Location(0, 10), 10.0), (Location(0, -10), 50.0)),
