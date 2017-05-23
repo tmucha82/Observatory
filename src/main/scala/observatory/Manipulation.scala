@@ -1,5 +1,7 @@
 package observatory
 
+import observatory.Visualization._
+
 /**
   * 4th milestone: value-added information
   */
@@ -11,7 +13,7 @@ object Manipulation {
     *         returns the predicted temperature at this location
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
-    ???
+    (latitude, longitude) => predictTemperature(temperatures, Location(latitude, longitude))
   }
 
   /**
@@ -20,18 +22,16 @@ object Manipulation {
     * @return A function that, given a latitude and a longitude, returns the average temperature at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Double)]]): (Int, Int) => Double = {
-    ???
+    (latitude, longitude) => temperaturess.par.map(temperatures => makeGrid(temperatures)(latitude, longitude)).sum / temperaturess.size
   }
 
   /**
     * @param temperatures Known temperatures
-    * @param normals A grid containing the “normal” temperatures
+    * @param normals      A grid containing the “normal” temperatures
     * @return A grid containing the deviations compared to the normal temperatures
     */
   def deviation(temperatures: Iterable[(Location, Double)], normals: (Int, Int) => Double): (Int, Int) => Double = {
-    ???
+    (latitude, longitude) => makeGrid(temperatures)(latitude, longitude) - normals(latitude, longitude)
   }
-
-
 }
 
