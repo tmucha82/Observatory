@@ -30,7 +30,9 @@ class Visualization2Test extends FunSuite with Checkers {
     val year = 1975
     val stationsPath = "/stations.csv"
     val temperaturePath = s"/test$year.csv"
+    val temperature2015Path = "/2015.csv"
     val file = new File(s"src/test/resources/${year}Tile2.png")
+    val temperaturesPath = "target/temperatures2"
   }
 
   test("bilinearInterpolation for some test data") {
@@ -77,24 +79,45 @@ class Visualization2Test extends FunSuite with Checkers {
 
   ignore("generateTiles with data from 2015") {
     new TestSet {
-      val temperaturesDirectory = new File("target/temperatures2")
+      val temperaturesDirectory = new File(temperaturesPath)
       assert(if (temperaturesDirectory.exists()) temperaturesDirectory.exists() else temperaturesDirectory.mkdir())
 
       def saveImage(year: Int, zoom: Int, x: Int, y: Int, data: Iterable[(Location, Double)]) = {
-        val zoomDirectory = new File(s"target/temperatures/$year/$zoom")
+        val zoomDirectory = new File(s"$temperaturesPath/$year/$zoom")
         assert(if (zoomDirectory.exists()) zoomDirectory.exists() else zoomDirectory.mkdirs())
 
-        val target = new File(s"target/temperatures/$year/$zoom/$x-$y.png")
+        val target = new File(s"$temperaturesPath/$year/$zoom/$x-$y.png")
         println(target.getCanonicalPath)
         tile(data, colorPalette, zoom, x, y).output(target)
         ()
       }
 
-      lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperaturePath)
+      lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperature2015Path)
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
       val data = Set((2015, averageTemperatures))
       println("#1 generating tiles")
       generateTiles(data, saveImage)
+    }
+    ()
+  }
+
+  /**
+    * Once you have implemented the above methods, you are ready to generate the tiles showing the deviations
+    * for all the years between 1990 and 2015, so that the final application (in the last milestone) will nicely display them:
+    * - Compute normals from yearly temperatures between 1975 and 1989 ;
+    * - Compute deviations for years between 1990 and 2015 ;
+    * - Generate tiles for zoom levels going from 0 to 3, showing the deviations. Use the “output” method of “Image” to write the tiles on your file system, under a location named according to the following scheme: “target/deviations/<year>/<zoom>/<x>-<y>.png”.
+    */
+  ignore("generate the tiles showing the deviations") {
+    new TestSet {
+      //TODO
+      lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+      val grid = Manipulation.makeGrid(averageTemperatures)
+
+      (1990 to 2015).foreach {
+        println
+      }
     }
     ()
   }
