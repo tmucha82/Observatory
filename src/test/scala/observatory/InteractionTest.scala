@@ -13,8 +13,6 @@ class InteractionTest extends FunSuite with Checkers {
 
   trait TestSet {
     val zoom = 2
-    val x = 0
-    val y = 0
 
     val colorPalette = List(
       (60.0, Color(255, 255, 255)),
@@ -30,7 +28,7 @@ class InteractionTest extends FunSuite with Checkers {
     val stationsPath = "/stations.csv"
     val temperaturePath = s"/test$year.csv"
     val temperature2015Path = "/2015.csv"
-    val file = new File(s"src/test/resources/${year}Tile.png")
+    val file = new File(s"src/test/resources/${year}Tile1.png")
   }
 
   test("tileLocation for different coordinates and zooms") {
@@ -49,7 +47,7 @@ class InteractionTest extends FunSuite with Checkers {
   test("tile for test location") {
     new TestSet {
       val averageTemperatures = List((Location(0, 0), 32.0)).toIterable
-      val image = tile(averageTemperatures, colorPalette, zoom, x, y)
+      val image = tile(averageTemperatures, colorPalette, zoom, 0, 0)
       assert(tileImageWidth === image.width)
       assert(tileImageHeight === image.height)
       image.pixels.foreach(pixel => {
@@ -67,7 +65,7 @@ class InteractionTest extends FunSuite with Checkers {
       lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
 
-      val image = tile(averageTemperatures, colorPalette, 2, 1, 1)
+      val image = tile(averageTemperatures, colorPalette, zoom, 1, 1)
       image.output(file)
       assert(tileImageWidth === image.width)
       assert(tileImageHeight === image.height)
@@ -83,7 +81,7 @@ class InteractionTest extends FunSuite with Checkers {
       def testData(year: Int, zoom: Int, x: Int, y: Int, data: (Int, Int, Int)) = println(s"$year, $zoom, $x, $y, $data")
 
       val data = Set((2001, (0, 0, 1)), (2002, (1, 1, 2)), (2003, (3, 2, 2)), (2004, (4, 2, 3)))
-      Interaction.generateTiles(data, testData)
+      generateTiles(data, testData)
     }
     ()
   }
@@ -107,7 +105,7 @@ class InteractionTest extends FunSuite with Checkers {
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
       val data = Set((2015, averageTemperatures))
       println("#1 generating tiles")
-      Interaction.generateTiles(data, saveImage)
+      generateTiles(data, saveImage)
     }
     ()
   }
