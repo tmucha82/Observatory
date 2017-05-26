@@ -33,6 +33,7 @@ class Visualization2Test extends FunSuite with Checkers {
     val temperature2015Path = "/2015.csv"
     val file = new File(s"src/test/resources/${year}Tile2.png")
     val temperaturesPath = "target/temperatures2"
+    val deviationsPath = "target/deviations"
   }
 
   test("bilinearInterpolation for some test data") {
@@ -77,26 +78,27 @@ class Visualization2Test extends FunSuite with Checkers {
     ()
   }
 
-  ignore("generateTiles with data from 2015") {
+  test("generateTiles with data from 2015") {
     new TestSet {
       val temperaturesDirectory = new File(temperaturesPath)
       assert(if (temperaturesDirectory.exists()) temperaturesDirectory.exists() else temperaturesDirectory.mkdir())
 
-      def saveImage(year: Int, zoom: Int, x: Int, y: Int, data: Iterable[(Location, Double)]) = {
+      def saveImage(year: Int, zoom: Int, x: Int, y: Int, data: (Int, Int) => Double) = {
         val zoomDirectory = new File(s"$temperaturesPath/$year/$zoom")
         assert(if (zoomDirectory.exists()) zoomDirectory.exists() else zoomDirectory.mkdirs())
 
         val target = new File(s"$temperaturesPath/$year/$zoom/$x-$y.png")
         println(target.getCanonicalPath)
-        if(!target.exists()) {
-          tile(data, colorPalette, zoom, x, y).output(target)
+        if (!target.exists()) {
+          visualizeGrid(data, colorPalette, zoom, x, y).output(target)
         }
         ()
       }
 
       lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperature2015Path)
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
-      val data = Set((2015, averageTemperatures))
+      lazy val grid = Manipulation.makeGrid(averageTemperatures)
+      val data = Set((2015, grid))
       println("#1 generating tiles")
       generateTiles(data, saveImage)
     }
@@ -113,13 +115,37 @@ class Visualization2Test extends FunSuite with Checkers {
   ignore("generate the tiles showing the deviations") {
     new TestSet {
       //TODO
-      lazy val temperatures = Extraction.locateTemperatures(year, stationsPath, temperaturePath)
-      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
-      val grid = Manipulation.makeGrid(averageTemperatures)
 
-      (1990 to 2015).foreach {
-        println
+      val deviationsDirectory = new File(deviationsPath)
+      assert(if (deviationsDirectory.exists()) deviationsDirectory.exists() else deviationsDirectory.mkdir())
+
+      def saveImage(year: Int, zoom: Int, x: Int, y: Int, data: (Int, Int) => Double) = {
+        val zoomDirectory = new File(s"$deviationsPath/$year/$zoom")
+        assert(if (zoomDirectory.exists()) zoomDirectory.exists() else zoomDirectory.mkdirs())
+
+        val target = new File(s"$deviationsPath/$year/$zoom/$x-$y.png")
+        println(target.getCanonicalPath)
+        if (!target.exists()) {
+          visualizeGrid(data, colorPalette, zoom, x, y).output(target)
+        }
+        ()
       }
+
+      println(s"Computing normals for 1995 - 1989")
+      val normals = Manipulation.average((1990 to 2015).map {
+        case yearToCalculate =>
+          println(s"Calculate data for $yearToCalculate")
+          lazy val temperatures = Extraction.locateTemperatures(yearToCalculate, stationsPath, s"/$yearToCalculate")
+          Extraction.locationYearlyAverageRecords(temperatures)
+      })
+      println(s"Computing deviations for year 1990")
+
+      lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperature2015Path)
+      lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
+      lazy val grid = Manipulation.deviation(averageTemperatures, normals)
+      val data = Set((2015, grid))
+      println("#1 generating tiles")
+      generateTiles(data, saveImage)
     }
     ()
   }
