@@ -88,7 +88,9 @@ class Visualization2Test extends FunSuite with Checkers {
 
         val target = new File(s"$temperaturesPath/$year/$zoom/$x-$y.png")
         println(target.getCanonicalPath)
-        tile(data, colorPalette, zoom, x, y).output(target)
+        if(!target.exists()) {
+          tile(data, colorPalette, zoom, x, y).output(target)
+        }
         ()
       }
 
