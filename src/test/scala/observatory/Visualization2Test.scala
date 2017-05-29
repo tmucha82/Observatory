@@ -114,8 +114,6 @@ class Visualization2Test extends FunSuite with Checkers {
     */
   ignore("generate the tiles showing the deviations") {
     new TestSet {
-      //TODO
-
       val deviationsDirectory = new File(deviationsPath)
       assert(if (deviationsDirectory.exists()) deviationsDirectory.exists() else deviationsDirectory.mkdir())
 
@@ -131,14 +129,14 @@ class Visualization2Test extends FunSuite with Checkers {
         ()
       }
 
-      println(s"Computing normals for 1995 - 1989")
-      val normals = Manipulation.average((1990 to 2015).map {
+      println(s"Computing normals for 1975 - 1989")
+      val normals = Manipulation.average((1975 to 1989).map {
         case yearToCalculate =>
-          println(s"Calculate data for $yearToCalculate")
-          lazy val temperatures = Extraction.locateTemperatures(yearToCalculate, stationsPath, s"/$yearToCalculate")
+          println(s"Calculating data for $yearToCalculate")
+          lazy val temperatures = Extraction.locateTemperatures(yearToCalculate, stationsPath, s"/$yearToCalculate.csv")
           Extraction.locationYearlyAverageRecords(temperatures)
       })
-      println(s"Computing deviations for year 1990")
+      println(s"Computing deviations for year 2015")
 
       lazy val temperatures = Extraction.locateTemperatures(2015, stationsPath, temperature2015Path)
       lazy val averageTemperatures = Extraction.locationYearlyAverageRecords(temperatures)
