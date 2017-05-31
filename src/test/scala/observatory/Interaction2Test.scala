@@ -16,4 +16,10 @@ class Interaction2Test extends FunSuite with Checkers {
       Layer(LayerName.Deviations, deviationColorPalette, 1990 to 2015)
     ) === availableLayers)
   }
+
+  test("yearBounds if change Range according to layer") {
+    val temperatureLayerSignal = Signal(availableLayers.head)
+    val deviationLayerSignal = Signal(availableLayers.tail.head)
+    val rangeSignal = yearBounds(temperatureLayerSignal)
+  }
 }
