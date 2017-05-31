@@ -30,15 +30,10 @@ object Interaction2 {
     */
   def availableLayers: Seq[Layer] = {
     List(
-      Layer(
-        LayerName.Temperatures,
-        temperatureColorPalette,
-        1975 to 1989
-      ),
-      Layer(LayerName.Deviations,
-        deviationColorPalette,
-        1990 to 2015)
-    )  }
+      Layer(LayerName.Temperatures, temperatureColorPalette, 1975 to 1989),
+      Layer(LayerName.Deviations, deviationColorPalette, 1990 to 2015)
+    )
+  }
 
   /**
     * @param selectedLayer A signal carrying the layer selected by the user
