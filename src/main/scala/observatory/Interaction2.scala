@@ -52,7 +52,9 @@ object Interaction2 {
     *         in the `selectedLayer` bounds.
     */
   def yearSelection(selectedLayer: Signal[Layer], sliderValue: Signal[Int]): Signal[Int] = {
-    ???
+    import math._
+    val yearRange = yearBounds(selectedLayer)
+    Signal(max(min(sliderValue(), yearRange().last), yearRange().head))
   }
 
   /**
