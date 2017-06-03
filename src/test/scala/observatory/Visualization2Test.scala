@@ -78,7 +78,7 @@ class Visualization2Test extends FunSuite with Checkers {
     ()
   }
 
-  test("generateTiles with data from 2015") {
+  ignore("generateTiles with data from 2015") {
     new TestSet {
       val temperaturesDirectory = new File(temperaturesPath)
       assert(if (temperaturesDirectory.exists()) temperaturesDirectory.exists() else temperaturesDirectory.mkdir())
