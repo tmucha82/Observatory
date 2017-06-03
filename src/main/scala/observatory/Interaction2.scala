@@ -1,5 +1,7 @@
 package observatory
 
+import scala.math._
+
 /**
   * 6th (and last) milestone: user interface polishing
   */
@@ -52,7 +54,6 @@ object Interaction2 {
     *         in the `selectedLayer` bounds.
     */
   def yearSelection(selectedLayer: Signal[Layer], sliderValue: Signal[Int]): Signal[Int] = {
-    import math._
     val yearRange = yearBounds(selectedLayer)
     Signal(max(min(sliderValue(), yearRange().last), yearRange().head))
   }
@@ -63,7 +64,7 @@ object Interaction2 {
     * @return The URL pattern to retrieve tiles
     */
   def layerUrlPattern(selectedLayer: Signal[Layer], selectedYear: Signal[Int]): Signal[String] = {
-    ???
+    Signal(s"target/${selectedLayer().layerName.id}/${selectedYear()}/{z}/{x}/{y}.png")
   }
 
   /**
@@ -72,7 +73,7 @@ object Interaction2 {
     * @return The caption to show
     */
   def caption(selectedLayer: Signal[Layer], selectedYear: Signal[Int]): Signal[String] = {
-    ???
+    Signal(s"${selectedLayer().layerName.id.capitalize} (${selectedYear()})")
   }
 
 }

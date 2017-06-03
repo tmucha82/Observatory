@@ -79,4 +79,36 @@ class Interaction2Test extends FunSuite with Checkers {
     assert(maxYear === yearSignal())
   }
 
+  test("layerUrlPattern for both layers") {
+    val layerSignal = Var(availableLayers.head)
+    val yearSignal = Var(2013)
+    val urlSignal = layerUrlPattern(layerSignal, yearSignal)
+    assert("target/temperatures/2013/{z}/{x}/{y}.png" === urlSignal())
+
+    yearSignal() = 2000
+    assert("target/temperatures/2000/{z}/{x}/{y}.png" === urlSignal())
+
+    layerSignal() = availableLayers.tail.head
+    assert("target/deviations/2000/{z}/{x}/{y}.png" === urlSignal())
+
+    yearSignal() = 2015
+    assert("target/deviations/2015/{z}/{x}/{y}.png" === urlSignal())
+  }
+
+  test("caption for both layers") {
+    val layerSignal = Var(availableLayers.head)
+    val yearSignal = Var(2013)
+    val urlSignal = caption(layerSignal, yearSignal)
+    assert("Temperatures (2013)" === urlSignal())
+
+    yearSignal() = 2000
+    assert("Temperatures (2000)" === urlSignal())
+
+    layerSignal() = availableLayers.tail.head
+    assert("Deviations (2000)" === urlSignal())
+
+    yearSignal() = 2015
+    assert("Deviations (2015)" === urlSignal())
+
+  }
 }
