@@ -27,7 +27,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     val temperaturesOf2013PathFile = s"/$year.csv"
   }
 
-  test("stations for test file") {
+  ignore("stations for test file") {
     new TestSet {
       val stationDataSet = stations(testStationsPathFile)
       stationDataSet.show(5)
@@ -55,7 +55,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     ()
   }
 
-  test("temperatures for test file") {
+  ignore("temperatures for test file") {
     new TestSet {
       val temperaturesDataSet = temperatures(testYear, testTemperaturesOf2013PathFile)
       temperaturesDataSet.show(5)
