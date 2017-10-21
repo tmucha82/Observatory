@@ -5,8 +5,9 @@ import java.time.LocalDate
 import observatory.Extraction._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.{Ignore, BeforeAndAfterAll, FunSuite}
 
+@Ignore
 @RunWith(classOf[JUnitRunner])
 class ExtractionTest extends FunSuite with BeforeAndAfterAll {
 
@@ -27,7 +28,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     val temperaturesOf2013PathFile = s"/$year.csv"
   }
 
-  ignore("stations for test file") {
+  test("stations for test file") {
     new TestSet {
       val stationDataSet = stations(testStationsPathFile)
       stationDataSet.show(5)
@@ -55,7 +56,7 @@ class ExtractionTest extends FunSuite with BeforeAndAfterAll {
     ()
   }
 
-  ignore("temperatures for test file") {
+  test("temperatures for test file") {
     new TestSet {
       val temperaturesDataSet = temperatures(testYear, testTemperaturesOf2013PathFile)
       temperaturesDataSet.show(5)
